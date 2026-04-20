@@ -1,0 +1,149 @@
+<h2>🧠 Your Mental Health Result</h2>
+
+<hr>
+
+<h3>
+💡 Your Result: 
+<span style="color:blue;">{{ severity }}</span>
+
+{% if severity == "Minimal" %} 😊
+{% elif severity == "Mild" %} 🙂
+{% elif severity == "Moderate" %} 😐
+{% elif severity == "Moderately Severe" %} 😟
+{% else %} 😞
+{% endif %}
+</h3>
+
+<p>
+Based on your responses over the last 2 weeks:
+</p>
+
+<hr>
+
+<h3>📊 Your Score</h3>
+
+<p>
+<strong>{{ score }}</strong> out of <strong>{{ max_score }}</strong>
+</p>
+
+<hr>
+
+<h3>📊 Score Breakdown</h3>
+
+<table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <th>Component</th>
+    <th>Score</th>
+    <th>Range</th>
+  </tr>
+
+  <tr>
+    <td>🧾 PHQ-8</td>
+    <td>{{ phq_score }}</td>
+    <td>0 – {{ phq_max }}</td>
+  </tr>
+
+  <tr>
+    <td>📝 Text Analysis</td>
+    <td>{{ text_score }}</td>
+    <td>0 – {{ text_max }}</td>
+  </tr>
+
+  <tr>
+    <td>🎧 Audio Analysis</td>
+    <td>{{ audio_score }}</td>
+    <td>0 – {{ audio_max }}</td>
+  </tr>
+
+</table>
+
+<hr>
+
+<!-- 🎨 COLORFUL SLIDER STYLE -->
+<style>
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, green, yellow, red);
+  outline: none;
+}
+</style>
+
+<!-- 🔥 SLIDER -->
+<input 
+  type="range" 
+  min="0" 
+  max="{{ max_score }}" 
+  value="{{ score }}" 
+  disabled 
+  style="width:100%;"
+>
+
+<p>🧾 PHQ</p>
+<input type="range" min="0" max="{{ phq_max }}" value="{{ phq_score }}" disabled>
+
+<p>📝 Text</p>
+<input type="range" min="0" max="{{ text_max }}" value="{{ text_score }}" disabled>
+
+<p>🎧 Audio</p>
+<input type="range" min="0" max="{{ audio_max }}" value="{{ audio_score }}" disabled>
+
+
+<p style="font-size:14px;">
+0 = Minimal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{{ max_score }} = Severe
+</p>
+
+<!-- 📍 ZONE LABEL -->
+<p>
+{% if severity == "Minimal" %}🟢 Minimal Zone
+{% elif severity == "Mild" %}🟡 Mild Zone
+{% elif severity == "Moderate" %}🟠 Moderate Zone
+{% elif severity == "Moderately Severe" %}🔴 High Risk Zone
+{% else %}🚨 Severe Zone
+{% endif %}
+</p>
+
+<hr>
+
+<h3>💬 What this means</h3>
+
+{% if severity == "Minimal" %}
+<p>You seem to be doing well. Keep maintaining a healthy lifestyle 😊</p>
+
+{% elif severity == "Mild" %}
+<p>You may be experiencing mild stress or low mood. Try relaxing and talking to someone you trust.</p>
+
+{% elif severity == "Moderate" %}
+<p>You might be going through a challenging time. Consider taking support from friends or professionals.</p>
+
+{% elif severity == "Moderately Severe" %}
+<p>You are experiencing strong symptoms. It’s important to seek help and not ignore these signs.</p>
+
+{% else %}
+<p><strong>You may need immediate support.</strong> Please consult a mental health professional.</p>
+
+{% endif %}
+
+<hr>
+
+<h3>🛠 Suggestions for You</h3>
+
+<ul>
+  {% for s in suggestions %}
+    <li>{{ s }}</li>
+  {% endfor %}
+</ul>
+
+<hr>
+
+<!-- 📊 CONFIDENCE LINE -->
+<p style="font-size:13px;">
+This result is based on questionnaire responses and AI-assisted analysis.
+</p>
+
+<p style="color:red;">
+⚠️ This tool is for awareness only and not a medical diagnosis.
+</p>
