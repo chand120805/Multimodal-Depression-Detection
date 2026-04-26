@@ -12,6 +12,10 @@ import uuid
 
 import pickle
 
+from cryptography.fernet import Fernet
+import io
+fernet = Fernet(settings.ENCRYPTION_KEY.encode())
+
 # Load once (global)
 with open("assessment/models/audio_model.pkl", "rb") as f:
     audio_model = pickle.load(f)
@@ -22,22 +26,34 @@ with open("assessment/models/audio_scaler.pkl", "rb") as f:
 # -------------------------------
 # SAVE AUDIO FILE
 # -------------------------------
-def save_audio(file):
-    # Ensure media folder exists
+def save_encrypted_audio(file):
     os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
 
-    # Unique filename (avoid overwrite)
-    filename = f"{uuid.uuid4()}_{file.name}"
-
-    # Define path FIRST ✅
+    filename = f"{uuid.uuid4()}_{file.name}.enc"
     path = os.path.join(settings.MEDIA_ROOT, filename)
 
-    # Save file
-    with open(path, 'wb+') as f:
-        for chunk in file.chunks():
-            f.write(chunk)
+    # read raw file
+    raw_data = file.read()
+
+    # encrypt
+    encrypted_data = fernet.encrypt(raw_data)
+
+    # save encrypted file
+    with open(path, 'wb') as f:
+        f.write(encrypted_data)
 
     return path
+
+def load_audio(path):
+    with open(path, 'rb') as f:
+        encrypted_data = f.read()
+
+    decrypted_data = fernet.decrypt(encrypted_data)
+    return decrypted_data
+
+def delete_audio(path):
+    if os.path.exists(path):
+        os.remove(path)
 
 
 # -------------------------------
@@ -106,8 +122,20 @@ def questionnaire(request):
         audio_file = request.FILES.get('audio')
 
         if audio_file:
-            audio_path = save_audio(audio_file)
-            audio_features = get_audio_features(audio_path)
+            audio_path = save_encrypted_audio(audio_file)
+
+            # decrypt temporarily
+            audio_bytes = load_audio(audio_path)
+
+            # convert to stream for librosa
+            audio_stream = io.BytesIO(audio_bytes)
+
+            # extract features
+            audio_features = get_audio_features(audio_stream)
+            print("Audio features:", audio_features)
+
+            # 🔥 DELETE AFTER USE
+            delete_audio(audio_path)
 
             if audio_features is not None:
                 audio_features = audio_scaler.transform([audio_features])

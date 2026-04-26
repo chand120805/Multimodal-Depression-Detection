@@ -121,3 +121,5 @@ STATIC_URL = 'static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY", "rtx1-KLrBpbuHhgt6gXPh1aJ0m3VbweItpP4DjKB6Xc= ")
